@@ -1,0 +1,42 @@
+
+[MapInfo]
+  Allying = false
+  FactionSize = 7
+  Number = 1
+  Protection = 2
+  SOTWEnd = 1653958702
+  SOTWSTart = 1653955520
+  Season = "Abyss"
+  Sharpness = 2
+
+[Network]
+  Address = ":19132"
+
+[Players]
+  Folder = "players"
+  MaxCount = 0
+  MaximumChunkRadius = 32
+  SaveData = true
+
+[Resources]
+  AutoBuildPack = true
+  Folder = "assets/resources"
+  Required = false
+
+[Sentry]
+  Dsn = ""
+  Release = ""
+
+[Server]
+  AuthEnabled = true
+  JoinMessage = ""
+  Name = "OwnageHCF"
+  QuitMessage = ""
+  ShutdownMessage = "OwnageHCF is restarting!"
+
+[Vasar]
+  Whitelisted = false
+
+[World]
+  Folder = "world"
+  Name = "World"
