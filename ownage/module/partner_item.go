@@ -28,12 +28,22 @@ func (m *PartnerItem) HandleItemUse(ctx *event.Context) {
 	item, off := m.u.Player().HeldItems()
 	it := item.Item()
 	if pi, ok := it.(pi.PartnerItem); ok {
-		if c, has := m.u.Cooldown(pi.Meta()); has && !c.Expired() {
+		if c, has := m.u.Cooldown(pi.Meta()); has {
+			if c.Expired() || c.TimeLeft().Seconds() < 0 {
+				m.u.RemoveCooldown(pi.Meta())
+				ctx.Cancel()
+				return
+			}
 			m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown.item", int(c.TimeLeft().Seconds())))
 			ctx.Cancel()
 			return
 		}
-		if c, has := m.u.Cooldown(user.PartnerItem); has && !c.Expired() {
+		if c, has := m.u.Cooldown(user.PartnerItem); has {
+			if c.Expired() || c.TimeLeft().Seconds() < 0 {
+				m.u.RemoveCooldown(user.PartnerItem)
+				ctx.Cancel()
+				return
+			}
 			m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown", int(c.TimeLeft().Seconds())))
 			ctx.Cancel()
 			return

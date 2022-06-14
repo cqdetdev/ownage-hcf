@@ -28,6 +28,13 @@ type PotionHandler interface {
 	HandleParticleColour(*event.Context, *player.Player, *color.RGBA)
 }
 
+// NopPotionHandler ...
+type NopPotionHandler struct{}
+
+func (NopPotionHandler) HandleSplash(*event.Context, *player.Player, *player.Player)      {}
+func (NopPotionHandler) HandleParticle(*event.Context, *player.Player)                    {}
+func (NopPotionHandler) HandleParticleColour(*event.Context, *player.Player, *color.RGBA) {}
+
 // SplashPotion is an item that grants effects when thrown.
 type SplashPotion struct {
 	transform
@@ -45,10 +52,10 @@ type SplashPotion struct {
 }
 
 const (
-	maxDebuffHit    = 1.0793 // Original Value: 1.0393
-	maxDebuffMiss   = 0.9393 // Original Value: 0.9093
-	maxNoDebuffHit  = 1.0725 // Original Value: 1.0325
-	maxNoDebuffMiss = 0.9325 // Original Value: 0.9025
+	maxDebuffHit    = 1.0993 // Original Value: 1.0393
+	maxDebuffMiss   = 0.9593 // Original Value: 0.9093
+	maxNoDebuffHit  = 1.0925 // Original Value: 1.0325
+	maxNoDebuffMiss = 0.9525 // Original Value: 0.9025
 )
 
 // NewSplashPotion ...
@@ -60,10 +67,11 @@ func NewSplashPotion(pos, vel mgl64.Vec3, yaw, pitch float64, t potion.Potion, d
 
 		t: t,
 		c: &entity.ProjectileComputer{MovementComputer: &entity.MovementComputer{
-			Gravity:           0.06,
+			Gravity:           0.080,
 			Drag:              0.0025,
 			DragBeforeGravity: true,
 		}},
+		h: NopPotionHandler{},
 
 		d: debuff,
 	}
@@ -84,10 +92,10 @@ func (s *SplashPotion) EncodeEntity() string {
 
 // Scale ...
 func (s *SplashPotion) Scale() float64 {
-	return 0.4
+	return 0.575
 }
 
-// AABB ...
+// BBox ...
 func (s *SplashPotion) BBox() cube.BBox {
 	return cube.Box(-0.125, 0, -0.125, 0.125, 0.25, 0.125)
 }
@@ -209,24 +217,27 @@ func (s *SplashPotion) Tick(w *world.World, current int64) {
 		}
 
 		pos := m.Position()
+		w.PlaySound(pos, sound.GlassBreak{})
+
+		s.close = true
+
 		ctx := event.C()
 		if p, ok := s.owner.(*player.Player); ok {
 			s.h.HandleParticleColour(ctx, p, &colour)
 		}
-		if !ctx.Cancelled() {
-			for _, e := range w.EntitiesWithin(cube.Box(-15, -15, -15, 15, 15, 15).Translate(pos), nil) {
-				if p, ok := e.(*player.Player); ok {
-					ctx := event.C()
-					s.h.HandleParticle(ctx, p)
-					if !ctx.Cancelled() {
-						p.ShowParticle(pos, particle.Splash{Colour: colour})
-					}
+		if ctx.Cancelled() {
+			// Cancelled, don't show the particle colour to anyone.
+			return
+		}
+		for _, e := range w.EntitiesWithin(cube.Box(-15, -15, -15, 15, 15, 15).Translate(pos), nil) {
+			if p, ok := e.(*player.Player); ok {
+				ctx := event.C()
+				s.h.HandleParticle(ctx, p)
+				if !ctx.Cancelled() {
+					p.ShowParticle(pos, particle.Splash{Colour: colour})
 				}
 			}
 		}
-		w.PlaySound(pos, sound.GlassBreak{})
-
-		s.close = true
 	}
 }
 

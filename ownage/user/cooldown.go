@@ -29,6 +29,9 @@ func NewCooldown(name string, length time.Duration, last time.Time) *Cooldown {
 func (u *User) Cooldown(n string) (*Cooldown, bool) {
 	for _, c := range u.cooldowns {
 		if c.Name == n {
+			if c.Expired() || c.TimeLeft().Milliseconds() < 0 {
+				return nil, false
+			}
 			return c, true
 		}
 	}

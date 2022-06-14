@@ -7,9 +7,9 @@ import (
 	"github.com/RestartFU/gophig"
 	"github.com/df-mc/dragonfly/server/cmd"
 	"github.com/df-mc/dragonfly/server/player/chat"
-	"github.com/sirupsen/logrus"
 	"github.com/ownagepe/hcf/ownage"
 	"github.com/ownagepe/hcf/ownage/command"
+	"github.com/sirupsen/logrus"
 
 	_ "net/http/pprof"
 	"os"
@@ -57,6 +57,7 @@ func registerCommands(v *ownage.Ownage) {
 		cmd.New("partneritem", "The main partner item faction", []string{"pi", "pp"}, command.PartnerItem{}),
 		cmd.New("pvp", "The main PVP command", nil, command.PvpEnable{}),
 		cmd.New("i", "The main utility commands for developer testing", nil, command.Kill{}),
+		cmd.New("kit", "The main kit command", []string{"kits"}, command.Kit{}),
 	} {
 		cmd.Register(c)
 	}

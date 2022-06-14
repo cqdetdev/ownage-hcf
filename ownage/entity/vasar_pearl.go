@@ -23,6 +23,11 @@ type PearlHandler interface {
 	HandleTeleport(*event.Context, *player.Player, mgl64.Vec3)
 }
 
+// NopPearlHandler ...
+type NopPearlHandler struct{}
+
+func (NopPearlHandler) HandleTeleport(*event.Context, *player.Player, mgl64.Vec3) {}
+
 // VasarPearl is a copy of an ender pearl with some edits.
 type VasarPearl struct {
 	transform
@@ -43,11 +48,12 @@ func NewEnderPearl(pos, vel mgl64.Vec3, yaw, pitch float64, owner world.Entity) 
 		yaw:   yaw,
 		pitch: pitch,
 		c: &entity.ProjectileComputer{MovementComputer: &entity.MovementComputer{
-			Gravity:           0.08,
+			Gravity:           0.065,
 			Drag:              0.0025,
 			DragBeforeGravity: true,
 		}},
 		owner: owner,
+		h:     NopPearlHandler{},
 	}
 	e.transform = newTransform(e, pos)
 	e.vel = vel
@@ -66,10 +72,10 @@ func (e *VasarPearl) EncodeEntity() string {
 
 // Scale ...
 func (e *VasarPearl) Scale() float64 {
-	return 0.4
+	return 0.575
 }
 
-// AABB ...
+// BBox ...
 func (e *VasarPearl) BBox() cube.BBox {
 	return cube.Box(-0.125, 0, -0.125, 0.125, 0.25, 0.125)
 }
@@ -103,10 +109,12 @@ func (e *VasarPearl) Tick(w *world.World, current int64) {
 	}
 
 	if result != nil {
+		var isEntity bool
 		if r, ok := result.(trace.EntityResult); ok {
 			if l, ok := r.Entity().(entity.Living); ok {
-				if _, vulnerable := l.Hurt(0.0, damage.SourceEntityAttack{Attacker: e}); vulnerable {
-					l.KnockBack(m.Position(), 0.45, 0.3708)
+				isEntity = ok
+				if _, vulnerable := l.Hurt(0.0, damage.SourceProjectile{Projectile: e, Owner: e.Owner()}); vulnerable {
+					l.KnockBack(m.Position(), 0.435, 0.355)
 				}
 			}
 		}
@@ -128,7 +136,9 @@ func (e *VasarPearl) Tick(w *world.World, current int64) {
 
 				p.Hurt(0, damage.SourceFall{})
 
-				p.SetAttackImmunity(400 * time.Millisecond)
+				if isEntity {
+					p.SetAttackImmunity(245 * time.Millisecond)
+				}
 			}
 		}
 
