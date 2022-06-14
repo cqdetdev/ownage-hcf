@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/ownagepe/hcf/ownage/user"
 	"github.com/upper/db/v4"
 	"github.com/upper/db/v4/adapter/mongo"
-	"github.com/ownagepe/hcf/ownage/user"
 )
 
 // userData is the data structure that is used to store the user data in the database.
@@ -67,10 +67,8 @@ type roleData struct {
 type cooldownData struct {
 	// Name is the name of the cooldown.
 	Name string `bson:"name"`
-	// Length is the length of the cooldown.
-	Length time.Duration `bson:"length"`
-	// Last is the last time the cooldown was called.
-	Last time.Time `bson:"last"`
+	// Expires is when the cooldown expires.
+	Expires time.Time `bson:"expires"`
 }
 
 // timerData is a data structure that is used to store pvp timer data in the database

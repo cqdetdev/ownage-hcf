@@ -9,29 +9,21 @@ const (
 
 type Cooldown struct {
 	Name string
-	Length time.Duration
-	Last time.Time
+	expiration time.Time
 }
 
-func (c *Cooldown) Expired() bool {
-	diff := time.Until(c.Last)
-	return diff > c.Length
-}
+func (cd *Cooldown) Expired() bool                  { return cd.expiration.Before(time.Now()) }
+func (cd *Cooldown) Expiration() time.Time          { return cd.expiration }
+func (cd *Cooldown) UntilExpiration() time.Duration { return time.Until(cd.expiration) }
+func (cd *Cooldown) SetCooldown(d time.Duration)    { cd.expiration = time.Now().Add(d) }
 
-func (c *Cooldown) TimeLeft() time.Duration {
-	return c.Length - time.Since(c.Last)
-}
-
-func NewCooldown(name string, length time.Duration, last time.Time) *Cooldown {
-	return &Cooldown{Name: name, Length: length, Last: last}
+func NewCooldown(name string, length time.Duration) *Cooldown {
+	return &Cooldown{Name: name, expiration: time.Now().Add(length)}
 }
 
 func (u *User) Cooldown(n string) (*Cooldown, bool) {
 	for _, c := range u.cooldowns {
 		if c.Name == n {
-			if c.Expired() || c.TimeLeft().Milliseconds() < 0 {
-				return nil, false
-			}
 			return c, true
 		}
 	}

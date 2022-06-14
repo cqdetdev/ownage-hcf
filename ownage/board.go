@@ -35,14 +35,14 @@ func (v *Ownage) startBoards() {
 					msg = append(msg, fmt.Sprintf("<aqua>PVP Timer</aqua><white>: %s</white>", f))
 				}
 				for _, cd := range u.Cooldowns() {
-					if cd.Expired() || cd.TimeLeft().Milliseconds() < 0 { continue }
+					if cd.Expired() || cd.UntilExpiration().Milliseconds() < 0 { continue }
 					if cd.Name == "partner_item" {
-						f := time.Unix(0, 0).UTC().Add(time.Duration(cd.TimeLeft())).Format("5")
+						f := time.Unix(0, 0).UTC().Add(time.Duration(cd.UntilExpiration())).Format("5")
 						msg = append(msg, fmt.Sprintf("<dark-purple>Partner Item</dark-purple><white>: %ss</white>", f))
 					}
 
 					if pi, ok := partner.ItemByMeta(cd.Name); ok {
-						f := time.Unix(0, 0).UTC().Add(time.Duration(cd.TimeLeft())).Format("5")
+						f := time.Unix(0, 0).UTC().Add(time.Duration(cd.UntilExpiration())).Format("5")
 						msg = append(msg, fmt.Sprintf("<dark-purple>%s</dark-purple><white>: %ss</white>", pi.Meta(), f))
 					}
 				}

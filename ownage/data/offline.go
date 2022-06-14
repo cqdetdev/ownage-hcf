@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/upper/db/v4"
 	"github.com/ownagepe/hcf/ownage/user"
+	"github.com/upper/db/v4"
 	"github.com/vasar-network/vails"
 	"github.com/vasar-network/vails/role"
 )
@@ -129,8 +129,7 @@ func SaveOfflineUser(u User) error {
 	for _, c := range u.Cooldowns {
 		data := cooldownData{
 			Name: c.Name,
-			Length: c.Length,
-			Last: c.Last,
+			Expires: c.Expiration(),
 		}
 		cooldowns = append(cooldowns, data)
 	}
@@ -191,7 +190,7 @@ func parseData(data userData) (User, error) {
 
 	var cooldowns []*user.Cooldown
 	for _, c := range data.Cooldowns {
-		cooldowns = append(cooldowns, user.NewCooldown(c.Name, c.Length, c.Last))
+		cooldowns = append(cooldowns, user.NewCooldown(c.Name, time.Now().Sub(c.Expires)))
 	}
 
 	return User{

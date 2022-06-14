@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/df-mc/dragonfly/server/player"
-	"github.com/upper/db/v4"
 	"github.com/ownagepe/hcf/ownage/user"
+	"github.com/upper/db/v4"
 	"github.com/vasar-network/vails"
 	"github.com/vasar-network/vails/role"
 	"golang.org/x/crypto/sha3"
@@ -63,7 +63,7 @@ func LoadUser(p *player.Player) (*user.User, error) {
 	}
 	var cooldowns []*user.Cooldown
 	for _, c := range data.Cooldowns {
-		cooldowns = append(cooldowns, user.NewCooldown(c.Name, c.Length, c.Last))
+		cooldowns = append(cooldowns, user.NewCooldown(c.Name, time.Now().Sub(c.Expires)))
 	}
 	return user.NewUser(p, user.NewRoles(roles, expirations), cooldowns, &user.Timer{Has: data.Timer.Has, Expires: data.Timer.Expires}, data.Settings, data.Stats, data.Money, data.FirstLogin, data.PlayTime, address, data.Whitelisted, data.Faction), nil
 }
@@ -83,8 +83,7 @@ func SaveUser(u *user.User) error {
 	for _, c := range u.Cooldowns() {
 		data := cooldownData{
 			Name: c.Name,
-			Length: c.Length,
-			Last: c.Last,
+			Expires: c.Expiration(),
 		}
 		cooldowns = append(cooldowns, data)
 	}

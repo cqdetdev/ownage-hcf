@@ -29,29 +29,27 @@ func (m *PartnerItem) HandleItemUse(ctx *event.Context) {
 	it := item.Item()
 	if pi, ok := it.(pi.PartnerItem); ok {
 		if c, has := m.u.Cooldown(pi.Meta()); has {
-			if c.Expired() || c.TimeLeft().Seconds() < 0 {
+			if c.Expired() {
 				m.u.RemoveCooldown(pi.Meta())
+			} else {
+				m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown.item", int(c.UntilExpiration().Seconds())))
 				ctx.Cancel()
 				return
 			}
-			m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown.item", int(c.TimeLeft().Seconds())))
-			ctx.Cancel()
-			return
 		}
 		if c, has := m.u.Cooldown(user.PartnerItem); has {
-			if c.Expired() || c.TimeLeft().Seconds() < 0 {
+			if c.Expired() {
 				m.u.RemoveCooldown(user.PartnerItem)
+			} else {
+				m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown", int(c.UntilExpiration().Seconds())))
 				ctx.Cancel()
 				return
 			}
-			m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown", int(c.TimeLeft().Seconds())))
-			ctx.Cancel()
-			return
 		}
 		pi.Run(m.u, nil)
 		m.u.Player().SetHeldItems(item.Grow(-1), off)
-		m.u.AddCooldown(user.NewCooldown(pi.Meta(), pi.Cooldown(), time.Now()))
-		m.u.AddCooldown(user.NewCooldown(user.PartnerItem, time.Second * 15, time.Now()))
+		m.u.AddCooldown(user.NewCooldown(pi.Meta(), pi.Cooldown()))
+		m.u.AddCooldown(user.NewCooldown(user.PartnerItem, time.Second * 15))
 		go data.SaveUser(m.u)
 	}
 }
