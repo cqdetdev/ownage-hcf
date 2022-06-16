@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/df-mc/dragonfly/server/player/scoreboard"
+	"github.com/ownagepe/hcf/ownage/data"
 	"github.com/ownagepe/hcf/ownage/item/partner"
 	"github.com/ownagepe/hcf/ownage/module"
 	"github.com/ownagepe/hcf/ownage/user"
@@ -35,7 +36,10 @@ func (v *Ownage) startBoards() {
 					msg = append(msg, fmt.Sprintf("<aqua>PVP Timer</aqua><white>: %s</white>", f))
 				}
 				for _, cd := range u.Cooldowns() {
-					if cd.Expired() || cd.UntilExpiration().Milliseconds() < 0 { continue }
+					if cd.Expired() || cd.UntilExpiration() < 0 {
+						u.RemoveCooldown(cd.Name)
+						go data.SaveUser(u)
+					}
 					if cd.Name == "partner_item" {
 						f := time.Unix(0, 0).UTC().Add(time.Duration(cd.UntilExpiration())).Format("5")
 						msg = append(msg, fmt.Sprintf("<dark-purple>Partner Item</dark-purple><white>: %ss</white>", f))

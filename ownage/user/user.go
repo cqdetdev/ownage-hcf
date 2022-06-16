@@ -17,10 +17,11 @@ import (
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/go-gl/mathgl/mgl64"
-	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 	c "github.com/ownagepe/hcf/ownage/claim"
 	ent "github.com/ownagepe/hcf/ownage/entity"
 	it "github.com/ownagepe/hcf/ownage/item"
+	"github.com/ownagepe/hcf/ownage/kit"
+	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 	"github.com/vasar-network/vails/lang"
 	"github.com/vasar-network/vails/role"
 	"github.com/vasar-network/vails/sets"
@@ -72,6 +73,18 @@ func LookupXUID(xuid string) (*User, bool) {
 	return u, ok
 }
 
+// Message sends a localized message to the user, implementing chat.Subscriber.
+func (u *User) Message(key string, args ...any) {
+	u.Player().Message(lang.Translatef(u.Player().Locale(), key, args...))
+}
+
+// Broadcast broadcasts a message to every user using that user's locale.
+func Broadcast(key string, args ...any) {
+	for _, u := range All() {
+		u.Message(key, args...)
+	}
+}
+
 // User is an extension of the Dragonfly player that adds a few extra features required by Vasar.
 type User struct {
 	p *player.Player
@@ -117,6 +130,8 @@ type User struct {
 	money int
 
 	roles *Roles
+
+	kit kit.Kit
 
 	cooldowns []*Cooldown
 
@@ -452,6 +467,14 @@ func (u *User) Stats() Stats {
 // SetStats sets the stats of the user.
 func (u *User) SetStats(stats Stats) {
 	u.stats.Store(stats)
+}
+
+func (u *User) Kit() kit.Kit {
+	return u.kit
+}
+
+func (u *User) SetKit(kit kit.Kit) {
+	u.kit = kit
 }
 
 // Player ...

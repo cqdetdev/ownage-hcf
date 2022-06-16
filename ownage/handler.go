@@ -37,6 +37,7 @@ type handler struct {
 	c  *module.Claim
 	cl *h.Click
 	co *module.Combat
+	cr *module.Crate
 	f *module.Faction
 	i  *module.Inventory
 	r  *module.Rods
@@ -80,6 +81,7 @@ func newHandler(u *user.User, v *Ownage) *handler {
 		c:  module.NewClaim(u),
 		cl: cl,
 		co: module.NewCombat(u),
+		cr: module.NewCrate(u),
 		f: module.NewFaction(u),
 		i:  module.NewInventory(u),
 		m:  module.NewModeration(u),
@@ -193,6 +195,7 @@ func (h *handler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]it
 // HandleItemUseOnBlock ...
 func (h *handler) HandleItemUseOnBlock(ctx *event.Context, pos cube.Pos, face cube.Face, clickPos mgl64.Vec3) {
 	h.i.HandleItemUseOnBlock(ctx, pos, face, clickPos)
+	h.cr.HandleItemUseOnBlock(ctx, pos, face, clickPos)
 }
 
 // HandleItemUse ...

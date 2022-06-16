@@ -16,6 +16,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/go-gl/mathgl/mgl64"
 	"github.com/ownagepe/hcf/ownage/data"
+	"github.com/ownagepe/hcf/ownage/kit"
 	"github.com/ownagepe/hcf/ownage/module"
 	"github.com/sandertv/gophertunnel/minecraft/text"
 	"github.com/sirupsen/logrus"
@@ -69,6 +70,7 @@ func New(log *logrus.Logger, config Config) *Ownage {
 	v.loadLocales()
 
 	v.loadTexts()
+	v.startCrates()
 	go v.startBoards()
 	go v.startBroadcasts()
 	go v.startPlayerBroadcasts()
@@ -143,7 +145,14 @@ func (v *Ownage) accept(p *player.Player) {
 	}
 	_ = data.SaveUser(u) // Ensure the user is saved on join, in case this is their first join.
 
+	k, ok := kit.Determine(u.Player())
+	if ok {
+		kit.ApplyEffects(k, p)
+		u.SetKit(k)
+	}
+
 	p.Handle(newHandler(u, v))
+	p.Armour().Inventory().Handle(InventoryHandler{p: p})
 	v.welcome(p)
 }
 
@@ -181,9 +190,9 @@ func (v *Ownage) loadLocales() {
 // loadTexts loads all relevant floating texts to the lobby world.
 func (v *Ownage) loadTexts() {
 	w := v.srv.World()
-	w.AddEntity(entity.NewText(text.Colourf("<bold><aqua>VASAR</aqua></bold>"), mgl64.Vec3{0.5, 29, 10.5}))
-	w.AddEntity(entity.NewText(text.Colourf("<grey>https://ownage.tebex.io</grey>"), mgl64.Vec3{0.5, 28.5, 10.5}))
-	w.AddEntity(entity.NewText(text.Colourf("<grey>discord.gg/ownage</grey>"), mgl64.Vec3{0.5, 28, 10.5}))
+	w.AddEntity(entity.NewText(text.Colourf("<bold><aqua>OWNAGE</aqua></bold>"), mgl64.Vec3{0.5, -56, 10.5}))
+	w.AddEntity(entity.NewText(text.Colourf("<grey>https://ownage.tebex.io</grey>"), mgl64.Vec3{0.5, -57, 10.5}))
+	w.AddEntity(entity.NewText(text.Colourf("<grey>discord.gg/ownage</grey>"), mgl64.Vec3{0.5, -58, 10.5}))
 	l := world.NewLoader(6, w, world.NopViewer{})
 	l.Move(w.Spawn().Vec3Middle())
 	l.Load(int(math.Round(math.Pi * 36)))

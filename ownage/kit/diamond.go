@@ -1,6 +1,8 @@
 package kit
 
 import (
+	"time"
+
 	"github.com/df-mc/dragonfly/server/entity/effect"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/item/enchantment"
@@ -40,5 +42,11 @@ func (Diamond) Armour(*player.Player) [4]item.Stack {
 
 // Effects ...
 func (n Diamond) Effects(*player.Player) []effect.Effect {
-	return []effect.Effect{}
+	return []effect.Effect{
+		effect.New(effect.Speed{}, 1, 24*time.Hour),
+	}
+}
+
+func (n Diamond) Type() int {
+	return DIAMOND
 }

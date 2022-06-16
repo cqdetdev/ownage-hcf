@@ -29,8 +29,9 @@ func (m *PartnerItem) HandleItemUse(ctx *event.Context) {
 	it := item.Item()
 	if pi, ok := it.(pi.PartnerItem); ok {
 		if c, has := m.u.Cooldown(pi.Meta()); has {
-			if c.Expired() {
+			if c.Expired() || c.UntilExpiration() < 0 {
 				m.u.RemoveCooldown(pi.Meta())
+				go data.SaveUser(m.u)
 			} else {
 				m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown.item", int(c.UntilExpiration().Seconds())))
 				ctx.Cancel()
@@ -38,8 +39,9 @@ func (m *PartnerItem) HandleItemUse(ctx *event.Context) {
 			}
 		}
 		if c, has := m.u.Cooldown(user.PartnerItem); has {
-			if c.Expired() {
+			if c.Expired() || c.UntilExpiration() < 0 {
 				m.u.RemoveCooldown(user.PartnerItem)
+				go data.SaveUser(m.u)
 			} else {
 				m.u.Player().Message(lang.Translatef(m.u.Player().Locale(), "pi.cooldown", int(c.UntilExpiration().Seconds())))
 				ctx.Cancel()

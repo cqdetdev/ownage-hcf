@@ -15,7 +15,13 @@ const (
 	MINER = 7
 )
 
-func Apply(kit vails.Kit, p *player.Player) {
+type Kit interface {
+	vails.Kit
+
+	Type() int
+}
+
+func Apply(kit Kit, p *player.Player) {
 	for _, eff := range p.Effects() {
 		p.RemoveEffect(eff.Type())
 	}
@@ -23,7 +29,6 @@ func Apply(kit vails.Kit, p *player.Player) {
 	inv := p.Inventory()
 	armourInv := p.Armour()
 	items := kit.Items(p)
-	effects := kit.Effects(p)
 	armour := kit.Armour(p)
 	for slot, it := range items {
 		if i, ok := inv.Item(slot); i.Empty() && ok == nil {
@@ -31,9 +36,6 @@ func Apply(kit vails.Kit, p *player.Player) {
 		} else {
 			p.Drop(it)
 		}
-	}
-	for _, eff := range effects {
-		p.AddEffect(eff)
 	}
 
 	for i, arm := range armour {
@@ -77,8 +79,15 @@ func ApplyEffects(kit vails.Kit, p *player.Player) {
 	}
 }
 
+func RemoveEffects(kit vails.Kit, p *player.Player) {
+	effects := kit.Effects(p)
+	for _, eff := range effects {
+		p.RemoveEffect(eff.Type())
+	}
+}
+
 // Determine is a function to determine what kit a player has on
-func Determine(p *player.Player) (vails.Kit, bool) {
+func Determine(p *player.Player) (Kit, bool) {
 	slots := p.Armour().Slots()
 	helmet := slots[0]
 	chest := slots[1]
@@ -86,18 +95,18 @@ func Determine(p *player.Player) (vails.Kit, bool) {
 	boots := slots[3]
 
 	if 
-		helmet.Equal(item.NewStack(item.Helmet{Tier: item.ArmourTierDiamond}, 1)) &&
-		chest.Equal(item.NewStack(item.Chestplate{Tier: item.ArmourTierDiamond}, 1)) &&
-		legs.Equal(item.NewStack(item.Leggings{Tier: item.ArmourTierDiamond}, 1)) &&
-		boots.Equal(item.NewStack(item.Boots{Tier: item.ArmourTierDiamond}, 1)) {
+		(helmet.Item() == item.Helmet{Tier: item.ArmourTierDiamond}) &&
+		(chest.Item() == item.Chestplate{Tier: item.ArmourTierDiamond}) &&
+		(legs.Item() == item.Leggings{Tier: item.ArmourTierDiamond}) &&
+		(boots.Item() == item.Boots{Tier: item.ArmourTierDiamond}) {
 		return Diamond{}, true
 	}
 
 	if 
-		helmet.Equal(item.NewStack(item.Helmet{Tier: item.ArmourTierGold}, 1)) &&
-		chest.Equal(item.NewStack(item.Chestplate{Tier: item.ArmourTierGold}, 1)) &&
-		legs.Equal(item.NewStack(item.Leggings{Tier: item.ArmourTierGold}, 1)) &&
-		boots.Equal(item.NewStack(item.Boots{Tier: item.ArmourTierGold}, 1)) {
+		(helmet.Item() == item.Helmet{Tier: item.ArmourTierGold}) &&
+		(chest.Item() == item.Chestplate{Tier: item.ArmourTierGold}) &&
+		(legs.Item() == item.Leggings{Tier: item.ArmourTierGold}) &&
+		(boots.Item() == item.Boots{Tier: item.ArmourTierGold}) {
 		return Bard{}, true
 	}
 
