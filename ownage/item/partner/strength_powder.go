@@ -3,7 +3,6 @@ package partner
 import (
 	"time"
 
-	"github.com/df-mc/dragonfly/server/entity/effect"
 	"github.com/ownagepe/hcf/ownage/user"
 	"github.com/sandertv/gophertunnel/minecraft/text"
 	"github.com/vasar-network/vails/lang"
@@ -18,8 +17,7 @@ type StrengthPowder struct {
 }
 
 func (s StrengthPowder) Run(user *user.User, on *user.User) {
-	user.Player().AddEffect(effect.New(effect.Strength{}, 2, time.Second*7))
-	user.Player().Message(text.Colourf(lang.Translate(s.Locale, "pi.strength_powder.use")))
+	user.Player().Message(text.Colourf(lang.Translate(s.Locale, "pi.switch_stick.use")))
 }
 
 func (s StrengthPowder) Name() string {

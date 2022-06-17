@@ -26,15 +26,20 @@ func (s SwitchStick) Run(user *user.User, on *user.User) {
 			times: 1,
 		}
 		return
+	} else {
+		o := count[user.Player().Name()]
+		o.times++
+		count[user.Player().Name()] = o
 	}
 
-	if count[user.Player().Name()].times >= 2 {
+	if count[user.Player().Name()].times > 2 {
 		on.Player().Move(mgl64.Vec3{}, on.Player().Data().Yaw / 2, 0)
+		delete(count, user.Player().Name())
 	}
 }
 
 func (s SwitchStick) Name() string {
-	return lang.Translatef(s.Locale, "pi.strength_powder.name")
+	return lang.Translatef(s.Locale, "pi.switch_stick.name")
 }
 
 func (s SwitchStick) Meta() string {
@@ -47,7 +52,7 @@ func (s SwitchStick) Description() string {
 
 // Cooldown ...
 func (SwitchStick) Cooldown() time.Duration {
-	return time.Second * 30
+	return time.Second * 45
 }
 
 // MaxCount ...
@@ -57,5 +62,5 @@ func (SwitchStick) MaxCount() int {
 
 // EncodeItem ...
 func (SwitchStick) EncodeItem() (name string, meta int16) {
-	return "minecraft:blaze_powder", 0
+	return "minecraft:stick", 0
 }

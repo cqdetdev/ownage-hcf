@@ -10,6 +10,7 @@ import (
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world/sound"
+	"github.com/ownagepe/hcf/ownage/data"
 	ent "github.com/ownagepe/hcf/ownage/entity"
 	"github.com/ownagepe/hcf/ownage/user"
 	"github.com/vasar-network/vails/lang"
@@ -123,6 +124,7 @@ func (c *Combat) HandleDeath(src damage.Source) {
 			stats.Deaths++
 			stats.KillStreak = 0
 			c.u.SetStats(stats)
+			go data.SaveUser(c.u)
 
 			stats = da.Stats()
 			stats.Kills++
@@ -131,6 +133,7 @@ func (c *Combat) HandleDeath(src damage.Source) {
 				stats.BestKillStreak = stats.KillStreak
 			}
 			da.SetStats(stats)
+			go data.SaveUser(da)
 		}
 	}
 }
