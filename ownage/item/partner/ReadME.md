@@ -19,7 +19,7 @@ Realizing how important this feature is going to be I decided to make a dedicate
      - Time Warps
      - Exotic Bone
      - Beacon
-     - Haelstrom
+     - Maelstrom
      - Sigil
      - Angel Boots
      - Effect/Pot/Pearl Disabler
