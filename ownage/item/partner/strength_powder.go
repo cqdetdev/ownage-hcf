@@ -17,7 +17,7 @@ type StrengthPowder struct {
 }
 
 func (s StrengthPowder) Run(user *user.User, on *user.User) {
-	user.Player().Message(text.Colourf(lang.Translate(s.Locale, "pi.switch_stick.use")))
+	user.Player().Message(text.Colourf(lang.Translate(s.Locale, "pi.strength_powder.use")))
 }
 
 func (s StrengthPowder) Name() string {
